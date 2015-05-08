@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<uexplugins>
+    <plugin
+        uexName="uexCoverFlow2" version="3.0.3" build="3">
+        <info>3:修复图片倒影问题</info>
+        <build>2:修复图片显示被截断的问题</build>
+        <build>1:修改网络图片不显示，去掉白色边框和倒影</build>
+        <build>0:旋转木马功能插件</build>
+    </plugin>
+</uexplugins>
