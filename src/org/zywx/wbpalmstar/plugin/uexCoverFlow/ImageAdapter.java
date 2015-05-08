@@ -94,6 +94,14 @@ public class ImageAdapter extends BaseAdapter {
 
                     });
                     imgLoadMgr.asyncLoad(coverFlowTask);
+                    if((mOrgImgList != null) && (mOrgImgList.size() < 4))
+                    {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 } else {
                     imageView.setImageBitmap(bitmap);
                 }
@@ -104,12 +112,11 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        // return mImageIds.length;
-        return Integer.MAX_VALUE;
+        return ((mImages!= null) ? Integer.MAX_VALUE : 0);
     }
 
     public Integer getItem(int position) {
-        if (mOrgImgList != null && mOrgImgList.size() < 4) {
+        if ((mOrgImgList != null) && (mOrgImgList.size() < 4)) {
             int nowPosition = position % mImages.length;
             switch (mOrgImgList.size()) {
             case 1: {
@@ -133,17 +140,22 @@ public class ImageAdapter extends BaseAdapter {
             }
             return nowPosition;
         } else {
-            return position % mImages.length;
+            return getId(position);
         }
-
     }
 
     public long getItemId(int position) {
-        return position % mImages.length;
+        return getId(position);
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        return mImages[position % mImages.length];
+        return mImages[getId(position)];
+    }
+    
+    private int getId(int position)
+    {
+        return ((position >= mImages.length) 
+                ? (position %= mImages.length) : position);
     }
 
     public float getScale(boolean focused, int offset) {

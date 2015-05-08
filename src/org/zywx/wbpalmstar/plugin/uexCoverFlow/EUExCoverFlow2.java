@@ -43,10 +43,10 @@ public class EUExCoverFlow2 extends EUExBase {
         try {
             final String tmId = params[0];
             tmIdSet.add(tmId);
-            final int x = Integer.parseInt(params[1]);
-            final int y = Integer.parseInt(params[2]);
-            final int w = Integer.parseInt(params[3]);
-            final int h = Integer.parseInt(params[4]);
+            final int x = (int)Float.parseFloat(params[1]);
+            final int y = (int)Float.parseFloat(params[2]);
+            final int w = (int)Float.parseFloat(params[3]);
+            final int h = (int)Float.parseFloat(params[4]);
             ((ActivityGroup) mContext).runOnUiThread(new Runnable() {
                 
                 @Override

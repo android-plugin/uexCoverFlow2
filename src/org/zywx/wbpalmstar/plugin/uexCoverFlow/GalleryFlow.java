@@ -1,5 +1,6 @@
 package org.zywx.wbpalmstar.plugin.uexCoverFlow;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Camera;
 
@@ -58,9 +59,24 @@ public class GalleryFlow extends Gallery {
         return view.getLeft() + view.getWidth() / 2;
     }
 
+    private int offsetChildrenLeftAndRight()
+    {
+        int offset = 0;
+        for (int i = getChildCount() - 1; i >= 0; i--)
+        {
+            getChildAt(i).offsetLeftAndRight(offset);
+            if (android.os.Build.VERSION.SDK_INT >= 16)
+            {
+                getChildAt(i).invalidate();
+            }
+        }
+        return offset;
+    }
+    
+    @SuppressLint("NewApi") 
     protected boolean getChildStaticTransformation(View child, Transformation t) {
 
-        final int childCenter = getCenterOfView(child);
+        final int childCenter = getCenterOfView(child) + offsetChildrenLeftAndRight();
         final int childWidth = child.getWidth();
         int rotationAngle = 0;
 
