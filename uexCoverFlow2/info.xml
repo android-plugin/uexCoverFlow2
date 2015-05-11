@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexCoverFlow2" version="3.0.3" build="3">
-        <info>3:修复图片倒影问题</info>
+        uexName="uexCoverFlow2" version="3.1.5" build="5">
+        <info>5:修复open接口传入小数时异常的问题。</info>
+        <build>4:1.修复图片小于4张一直显示默认图片的问题；
+                 2.修复开启硬件加速后，图片歪的问题。</build>
+        <build>3:修复图片倒影问题</build>
         <build>2:修复图片显示被截断的问题</build>
         <build>1:修改网络图片不显示，去掉白色边框和倒影</build>
         <build>0:旋转木马功能插件</build>
