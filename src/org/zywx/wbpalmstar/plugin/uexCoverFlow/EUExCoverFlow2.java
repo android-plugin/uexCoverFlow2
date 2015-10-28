@@ -1,83 +1,36 @@
 package org.zywx.wbpalmstar.plugin.uexCoverFlow;
 
-import java.util.HashSet;
+import java.util.HashMap;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.zywx.wbpalmstar.engine.EBrowserView;
 import org.zywx.wbpalmstar.engine.universalex.EUExBase;
-import android.app.Activity;
-import android.app.ActivityGroup;
-import android.app.LocalActivityManager;
 import android.content.Context;
-import android.content.Intent;
+import android.os.Bundle;
+import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 public class EUExCoverFlow2 extends EUExBase {
 
     public static final String CALLBACK_LOAD_DATA = "uexCoverFlow2.loadData";
     public static final String ON_ITEM_SELECTED = "uexCoverFlow2.onItemSelected";
     private static String TAG = "EUExCoverFlow";
-    private HashSet<String> tmIdSet = new HashSet<String>();
+    private static final String BUNDLE_DATA = "data";
+    private static final int MSG_OPEN = 1;
+    private static final int MSG_SET_JSON_DATA = 2;
+    private static final int MSG_CLOSE = 3;
+    private HashMap<String, CoverFlowMainView> coverViews = new HashMap<String, CoverFlowMainView>();
 
     public EUExCoverFlow2(Context context, EBrowserView inParent) {
         super(context, inParent);
         // TODO Auto-generated constructor stub
     }
 
-    public void open(String[] params) {
-        if (params.length != 5) {
-            return;
-        }
-        try {
-            final String tmId = params[0];
-            tmIdSet.add(tmId);
-            final int x = (int)Float.parseFloat(params[1]);
-            final int y = (int)Float.parseFloat(params[2]);
-            final int w = (int)Float.parseFloat(params[3]);
-            final int h = (int)Float.parseFloat(params[4]);
-            ((ActivityGroup) mContext).runOnUiThread(new Runnable() {
-                
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    Intent intent = new Intent(mContext, CoverFlowMainActivity.class);
-                    intent.putExtra(CoverFlowMainActivity.COVERFLOW_IMG_WIDTH, w);
-                    intent.putExtra(CoverFlowMainActivity.COVERFLOW_IMG_HEIGHT, h);
-                    LocalActivityManager mgr = ((ActivityGroup) mContext).getLocalActivityManager();
-                    CoverFlowMainActivity coverFlowActivity = (CoverFlowMainActivity) mgr.getActivity(TAG + tmId);
-                    if (coverFlowActivity != null) {
-                        View view = coverFlowActivity.getWindow().getDecorView();
-                        removeViewFromCurrentWindow(view);
-                        view = null;
-                    }
-                    Window window = mgr.startActivity(TAG + tmId, intent);
-                    View decorView = window.getDecorView();
-                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(w, h);
-                    lp.leftMargin = x;
-                    lp.topMargin = y;
-                    addView2CurrentWindow(decorView, lp);
-                    String js = SCRIPT_HEADER + "if(" + CALLBACK_LOAD_DATA + "){" + CALLBACK_LOAD_DATA + "('" + tmId + "');}";
-                    onCallback(js);
-                }
-            });
-           
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
     /**
 	 * @param child
 	 * @param parms
@@ -92,19 +45,75 @@ public class EUExCoverFlow2 extends EUExBase {
 		lp.gravity = Gravity.NO_GRAVITY;
 		lp.leftMargin = l;
 		lp.topMargin = t;
-		// adptLayoutParams(parms, lp);
-		// Log.i(TAG, "addView2CurrentWindow");
 		mBrwView.addViewToCurrentWindow(child, lp);
 	}
 
-    /**
-     * 为CoverFlowData设置参数<br>
-     * 实际形式:setJsonData(String json);
-     * 
-     * @param params
-     */
+    @Override
+    protected boolean clean() {
+        return false;
+    }
+
+    private void closeCoverFlowView(final String tmId) {
+        if (!coverViews.containsKey(tmId) || (coverViews.get(tmId) == null)) return;
+        removeViewFromCurrentWindow(coverViews.get(tmId));
+        coverViews.remove(tmId);
+    }
+    public void open(String[] params) {
+        if (params == null || params.length < 1) {
+            errorCallback(0, 0, "error params!");
+            return;
+        }
+        Message msg = new Message();
+        msg.obj = this;
+        msg.what = MSG_OPEN;
+        Bundle bd = new Bundle();
+        bd.putStringArray(BUNDLE_DATA, params);
+        msg.setData(bd);
+        mHandler.sendMessage(msg);
+    }
+
+    private void openMsg(String[] params) {
+        if (params.length < 5) {
+            return;
+        }
+        try {
+            final String tmId = params[0];
+            if (coverViews.containsKey(tmId)) return;
+            final int x = (int)Float.parseFloat(params[1]);
+            final int y = (int)Float.parseFloat(params[2]);
+            final int w = (int)Float.parseFloat(params[3]);
+            final int h = (int)Float.parseFloat(params[4]);
+            CoverFlowMainView coverFlowView = new CoverFlowMainView(mContext, w, h);
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(w, h);
+            lp.leftMargin = x;
+            lp.topMargin = y;
+            addView2CurrentWindow(coverFlowView, lp);
+            String js = SCRIPT_HEADER + "if(" + CALLBACK_LOAD_DATA + "){"
+                    + CALLBACK_LOAD_DATA + "('" + tmId + "');}";
+            onCallback(js);
+            coverViews.put(tmId, coverFlowView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void setJsonData(String[] params) {
-        if (params.length != 2) {
+        if (params == null || params.length < 1) {
+            errorCallback(0, 0, "error params!");
+            return;
+        }
+        Message msg = new Message();
+        msg.obj = this;
+        msg.what = MSG_SET_JSON_DATA;
+        Bundle bd = new Bundle();
+        bd.putStringArray(BUNDLE_DATA, params);
+        msg.setData(bd);
+        mHandler.sendMessage(msg);
+    }
+
+    private void setJsonDataMsg(String[] params) {
+        if (params.length < 2) {
             return;
         }
         final CoverFlowData coverFlowData = CoverFlowData.parseCoverFlowJson(params[0]);
@@ -112,33 +121,36 @@ public class EUExCoverFlow2 extends EUExBase {
         if (coverFlowData == null) {
             return;
         }
-        final ActivityGroup activityGroup = (ActivityGroup) mContext;
-        activityGroup.runOnUiThread(new Runnable() {
+        if (!coverViews.containsKey(coverFlowData.getTmId())) return;
+        CoverFlowMainView coverFlowView = coverViews.get(coverFlowData.getTmId());
+        coverFlowView.setData(imgBgPath, coverFlowData, new OnItemClickListener() {
             @Override
-            public void run() {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 // TODO Auto-generated method stub
-                LocalActivityManager mgr = activityGroup.getLocalActivityManager();
-                Activity activity = mgr.getActivity(TAG + coverFlowData.getTmId());
-                if (activity != null && activity instanceof CoverFlowMainActivity) {
-                    CoverFlowMainActivity coverFlowMainActivity = ((CoverFlowMainActivity) activity);
-                    coverFlowMainActivity.setData(imgBgPath,coverFlowData, new OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                            // TODO Auto-generated method stub
-                            String js = SCRIPT_HEADER + "if(" + ON_ITEM_SELECTED + "){" + ON_ITEM_SELECTED + "('"
-                                    + coverFlowData.getTmId() + "'," + adapterView.getAdapter().getItem(position)
-                                    + ");}";
-                            onCallback(js);
-                        }
-                    });
-                }
+                String js = SCRIPT_HEADER + "if(" + ON_ITEM_SELECTED + "){" + ON_ITEM_SELECTED + "('"
+                        + coverFlowData.getTmId() + "'," + adapterView.getAdapter().getItem(position)
+                        + ");}";
+                onCallback(js);
             }
         });
-
     }
 
     public void close(String[] params) {
-        if (params.length != 1) {
+        if (params == null || params.length < 1) {
+            errorCallback(0, 0, "error params!");
+            return;
+        }
+        Message msg = new Message();
+        msg.obj = this;
+        msg.what = MSG_CLOSE;
+        Bundle bd = new Bundle();
+        bd.putStringArray(BUNDLE_DATA, params);
+        msg.setData(bd);
+        mHandler.sendMessage(msg);
+    }
+
+    private void closeMsg(String[] params) {
+        if (params.length < 1) {
             return;
         }
         String[] paramsArray = params[0].split(",");
@@ -151,36 +163,27 @@ public class EUExCoverFlow2 extends EUExBase {
                 closeCoverFlowView(tmId);
             }
         }
-        tmIdSet.clear();
     }
 
     @Override
-    protected boolean clean() {
-        // TODO Auto-generated method stub
-        for (String tmId : tmIdSet) {
-            if (!TextUtils.isEmpty(tmId)) {
-                closeCoverFlowView(tmId);
-            }
+    public void onHandleMessage(Message message) {
+        if(message == null){
+            return;
         }
-        return false;
-    }
+        Bundle bundle=message.getData();
+        switch (message.what) {
 
-    private void closeCoverFlowView(final String tmId) {
-        ((ActivityGroup) mContext).runOnUiThread(new Runnable() {
-            
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                LocalActivityManager mgr = ((ActivityGroup) mContext).getLocalActivityManager();
-                Activity activity = mgr.getActivity(TAG + tmId);
-                if (activity != null && activity instanceof CoverFlowMainActivity) {
-                    CoverFlowMainActivity coverFlowActivity = ((CoverFlowMainActivity) activity);
-                    View decorView = coverFlowActivity.getWindow().getDecorView();
-                    removeViewFromCurrentWindow(decorView);
-                    mgr.destroyActivity(TAG+tmId, true);
-                }
-            }
-        });
-       
+            case MSG_OPEN:
+                openMsg(bundle.getStringArray(BUNDLE_DATA));
+                break;
+            case MSG_SET_JSON_DATA:
+                setJsonDataMsg(bundle.getStringArray(BUNDLE_DATA));
+                break;
+            case MSG_CLOSE:
+                closeMsg(bundle.getStringArray(BUNDLE_DATA));
+                break;
+            default:
+                super.onHandleMessage(message);
+        }
     }
 }

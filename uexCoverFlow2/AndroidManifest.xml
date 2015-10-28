@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest>
-        <!-- CoverFlow2 start-->
-  	<activity android:name="org.zywx.wbpalmstar.plugin.uexCoverFlow.CoverFlowMainActivity" 
-		    android:configChanges="orientation|keyboardHidden" 
-		    android:theme="@android:style/Theme.NoTitleBar"
-			android:windowSoftInputMode="stateHidden|adjustResize" />
-	<!-- end -->	
-</manifest>
