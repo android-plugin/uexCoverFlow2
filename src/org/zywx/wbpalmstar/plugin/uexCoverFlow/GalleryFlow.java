@@ -13,6 +13,7 @@ import android.view.animation.Transformation;
 import android.widget.Gallery;
 import android.widget.LinearLayout;
 
+@SuppressWarnings("deprecation")
 public class GalleryFlow extends Gallery {
 
     private Camera mCamera = new Camera();
@@ -59,24 +60,9 @@ public class GalleryFlow extends Gallery {
         return view.getLeft() + view.getWidth() / 2;
     }
 
-    private int offsetChildrenLeftAndRight()
-    {
-        int offset = 0;
-        for (int i = getChildCount() - 1; i >= 0; i--)
-        {
-            getChildAt(i).offsetLeftAndRight(offset);
-            if (android.os.Build.VERSION.SDK_INT >= 16)
-            {
-                getChildAt(i).invalidate();
-            }
-        }
-        return offset;
-    }
-    
     @SuppressLint("NewApi") 
     protected boolean getChildStaticTransformation(View child, Transformation t) {
-
-        final int childCenter = getCenterOfView(child) + offsetChildrenLeftAndRight();
+        final int childCenter = getCenterOfView(child);
         final int childWidth = child.getWidth();
         int rotationAngle = 0;
 

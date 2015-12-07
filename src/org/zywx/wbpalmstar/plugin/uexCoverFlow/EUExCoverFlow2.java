@@ -10,6 +10,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AbsoluteLayout;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
@@ -56,6 +57,7 @@ public class EUExCoverFlow2 extends EUExBase {
     private void closeCoverFlowView(final String tmId) {
         if (!coverViews.containsKey(tmId) || (coverViews.get(tmId) == null)) return;
         removeViewFromCurrentWindow(coverViews.get(tmId));
+        removeViewFromWebView(tmId);
         coverViews.remove(tmId);
     }
     public void open(String[] params) {
@@ -83,11 +85,22 @@ public class EUExCoverFlow2 extends EUExBase {
             final int y = (int)Float.parseFloat(params[2]);
             final int w = (int)Float.parseFloat(params[3]);
             final int h = (int)Float.parseFloat(params[4]);
+			String isAddToWebView = "0";
+			if (params.length == 6) {
+				isAddToWebView = params[5];
+			}
             CoverFlowMainView coverFlowView = new CoverFlowMainView(mContext, w, h);
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(w, h);
             lp.leftMargin = x;
             lp.topMargin = y;
-            addView2CurrentWindow(coverFlowView, lp);
+            if("1".equals(isAddToWebView)){
+				@SuppressWarnings("deprecation")
+				AbsoluteLayout.LayoutParams lps = new AbsoluteLayout.LayoutParams(
+						w, h, x, y);
+            	addViewToWebView(coverFlowView, lps, tmId);
+            }else{
+            	addView2CurrentWindow(coverFlowView, lp);
+            }
             String js = SCRIPT_HEADER + "if(" + CALLBACK_LOAD_DATA + "){"
                     + CALLBACK_LOAD_DATA + "('" + tmId + "');}";
             onCallback(js);
