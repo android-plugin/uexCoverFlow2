@@ -20,20 +20,24 @@
         alert(a+b+c);
     }
     function pieOpen(){
-
-
+    	alert("Open(web)");
 		var w = screen.availWidth/2;
         var h = screen.availHeight/2;
         
          var divTop = document.getElementById("topDiv").offsetTop + document.getElementById("topDiv").offsetHeight;
-
-        uexCoverFlow2.open("500","100",divTop,w,h);
+		divTop = 0;
+        uexCoverFlow2.open("500","100",divTop,w,h,"1");
      }
     function pieOpen1(){
-        uexCoverFlow2.open("510","200","0","320","360");//第二个
+    	alert("Open(win)");
+        uexCoverFlow2.open("510","200","0","250","360","0");//第二个
     }
     function pieClose(){
         var idarr = "500";//        var idarr = ["500","510"];
+        uexCoverFlow2.close(idarr);
+    }
+    function pieClose1(){
+        var idarr = "510";//        var idarr = ["500","510"];
         uexCoverFlow2.close(idarr);
     }
 	window.uexOnload = function(){
@@ -60,8 +64,14 @@
     <div class="tit">CoverFlow2</div>
 	<div class="conbor">
 			<div class="consj" id="topDiv">
-				<input class="btn" type="button" value="打开CoverFlow2" onclick="pieOpen();">
-                <input class="btn" type="button" value="关闭" onclick="pieClose();">
+				<input class="btn" type="button" value="打开CoverFlow2(web)" onclick="pieOpen();">
+				<input class="btn" type="button" value="打开CoverFlow2(win)" onclick="pieOpen1();">
+                <input class="btn" type="button" value="关闭(web)" onclick="pieClose();">
+                <input class="btn" type="button" value="关闭(win)" onclick="pieClose1();">
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 			</div>
 		</div>
 </body>

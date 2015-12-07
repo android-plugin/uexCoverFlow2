@@ -65,7 +65,7 @@ public class ImageAdapter extends BaseAdapter {
                 imgLinearLayout.setLayoutParams(new GalleryFlow.LayoutParams((imgWidth*2/3-20),height));
                 imgLinearLayout.setBackgroundColor(Color.TRANSPARENT);
                 imgLinearLayout.setGravity(Gravity.CENTER);
-                final ImageView imageView = new ImageView(mContext);
+                final ImageView imageView = new CoverFlowImageView(mContext);
                 LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT); 
                 imgParams.setMargins(5, 5, 5, 5);
@@ -87,7 +87,7 @@ public class ImageAdapter extends BaseAdapter {
                             if(bitmap != null){
                                 imageView.setImageBitmap(bitmap);
                             }
-                            // 闇�缂撳瓨鏇存柊
+                            // 需要缓存更新
 //                          createReflectedImages();
 //                            notifyDataSetChanged();
                         }
@@ -188,7 +188,7 @@ public class ImageAdapter extends BaseAdapter {
 //            }
             if(myoriginalImage == null)
                 return null;
-            //瀵瑰浘鐗囪繘琛屾寜姣斾緥缂╂斁锛屽惁鍒欏浘鐗囧お澶э紝鍐呭瓨婧㈠嚭
+            //对图片进行按比例缩放，否则图片太大，内存溢出
             if(myoriginalImage != null){
                 int width = myoriginalImage.getWidth();
                 int height = myoriginalImage.getHeight();
@@ -226,7 +226,7 @@ public class ImageAdapter extends BaseAdapter {
         this.imgHeight = imgHeight;
     }
     /**
-     * 缁樺埗鍊掑奖
+     * 绘制倒影
      * @param originalImage
      * @return
      */
@@ -270,7 +270,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     /**
-     * 缁樺埗鍥剧墖鐧借壊杈规
+     * 绘制图片白色边框
      * @param bm
      * @return
      */
@@ -281,28 +281,28 @@ public class ImageAdapter extends BaseAdapter {
         BitmapFactory.Options options = new BitmapFactory.Options();  
         options.inJustDecodeBounds = true;  
         
-        // 杈规鐨勫楂�
+        // 边框的宽高
         final int smallW = 5;
         final int smallH = 5;
         
-        // 鍘熷浘鐗囩殑瀹介珮
+        // 原图片的宽高
         final int bigW = bm.getWidth();
         final int bigH = bm.getHeight();
         
         int wCount = (int) Math.ceil(bigW * 1.0 / smallW);
         int hCount = (int) Math.ceil(bigH  * 1.0 / smallH);
         
-        // 缁勫悎鍚庡浘鐗囩殑瀹介珮
+        // 组合后图片的宽高
         int newW = (wCount + 2) * smallW;
         int newH = (hCount + 2) * smallH;
         
-        // 閲嶆柊瀹氫箟澶у皬
+        // 重新定义大小
         Bitmap newBitmap = Bitmap.createBitmap(newW, newH, Config.ARGB_8888);
         Canvas canvas = new Canvas(newBitmap);
         Paint p = new Paint();
         p.setColor(Color.WHITE);
         canvas.drawRect(new Rect(0, 0, newW, newH), p);
-        // 缁樺師鍥�
+        // 绘原图
         canvas.drawBitmap(bm, (newW - bigW - 2 * smallW) / 2 + smallW, (newH - bigH - 2 * smallH) / 2 + smallH, null);
         canvas.save(Canvas.ALL_SAVE_FLAG);
         canvas.restore();
@@ -310,7 +310,7 @@ public class ImageAdapter extends BaseAdapter {
     }
     
     /**
-     * 绛夋瘮渚嬬缉鏀惧浘鐗�
+     * 等比例缩放图片
      * 
      * @param bitmap
      * @param w
@@ -326,6 +326,28 @@ public class ImageAdapter extends BaseAdapter {
         matrix.postScale(scaleWidht, scaleHeight);
         Bitmap newbmp = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
         return newbmp;
+    }
+    
+    /**
+     * 自定义ImageView
+     * 解决4.1以上出现的定位不准问题
+     * @author zywx
+     *
+     */
+    private class CoverFlowImageView extends ImageView{
+
+		public CoverFlowImageView(Context context) {
+			super(context);
+		}
+		
+		@Override
+		public void offsetLeftAndRight(int offset) {
+			super.offsetLeftAndRight(offset);
+			//解决在4.1以上出现的定位不准的问题
+			if (android.os.Build.VERSION.SDK_INT >= 16) {
+				invalidate();
+			}
+		}
     }
     
 }
