@@ -18,7 +18,6 @@ import org.zywx.wbpalmstar.engine.EBrowserView;
 import org.zywx.wbpalmstar.engine.universalex.EUExBase;
 
 import java.util.HashMap;
-import java.util.Set;
 
 public class EUExCoverFlow2 extends EUExBase {
 
@@ -224,10 +223,10 @@ public class EUExCoverFlow2 extends EUExBase {
 
     private void closeMsg(String[] params) {
         if (params == null || params.length < 1) {
-            Set<String> keySet = coverViews.keySet();
-            for (String key : keySet) {
-                closeCoverFlowView(key);
-            }
+            return;
+        }
+        if (!params[0].contains(",")) {
+            closeCoverFlowView(params[0]);
             return;
         }
         String[] paramsArray = params[0].split(",");
