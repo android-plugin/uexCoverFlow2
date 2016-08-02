@@ -1,11 +1,11 @@
 package org.zywx.wbpalmstar.plugin.uexCoverFlow;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CoverFlowData {
 
@@ -13,10 +13,11 @@ public class CoverFlowData {
     public static final String JK_DATA = "data";
     public static final String JK_TITLE = "title";
     public static final String JK_URL_IMAGE_URL = "imageUrl";
+    public static final String JK_PLACEHOLDER_IMAGE = "placeholderImage";
 
     /**
      * 解析TimeMachine相关信息
-     * 
+     *
      * @param msg
      * @return
      */
@@ -29,13 +30,18 @@ public class CoverFlowData {
         try {
             JSONObject json = new JSONObject(msg);
             coverFlow = new CoverFlowData();
-            coverFlow.setTmId(json.getString(JK_ID));
+            coverFlow.setTmId(json.optString(JK_ID, String.valueOf(getRandomId())));
+            coverFlow.setPlaceholderImage(json.getString(JK_PLACEHOLDER_IMAGE));
             JSONArray array = json.getJSONArray(JK_DATA);
             for (int i = 0, size = array.length(); i < size; i++) {
-                JSONObject jsonItem = array.getJSONObject(i);
                 ItemInfo itemInfo = new ItemInfo();
-                itemInfo.setTitle(jsonItem.optString(JK_TITLE));
-                itemInfo.setImgUrl(jsonItem.getString(JK_URL_IMAGE_URL));
+                if (array.get(i) instanceof String) {//如果数组中只有图片的url
+                    itemInfo.setImgUrl(array.get(i).toString());
+                } else {//如果数组中是对象，包含有title和url
+                    JSONObject jsonItem = array.getJSONObject(i);
+                    itemInfo.setTitle(jsonItem.optString(JK_TITLE));
+                    itemInfo.setImgUrl(jsonItem.getString(JK_URL_IMAGE_URL));
+                }
                 coverFlow.add(itemInfo);
             }
         } catch (JSONException e) {
@@ -43,8 +49,11 @@ public class CoverFlowData {
         }
         return coverFlow;
     }
-
+    private static int getRandomId() {
+        return (int)(Math.random() * 100000);
+    }
     private String tmId;
+    private String placeholderImage;
     private List<ItemInfo> list;
 
     public CoverFlowData() {
@@ -57,6 +66,14 @@ public class CoverFlowData {
 
     public void setTmId(String tmId) {
         this.tmId = tmId;
+    }
+
+    public void setPlaceholderImage(String placeholderImage) {
+        this.placeholderImage = placeholderImage;
+    }
+
+    public String getPlaceholderImage() {
+        return placeholderImage;
     }
 
     public void add(ItemInfo item) {

@@ -1,9 +1,5 @@
 package org.zywx.wbpalmstar.plugin.uexCoverFlow;
 
-import java.util.HashMap;
-
-import org.zywx.wbpalmstar.engine.EBrowserView;
-import org.zywx.wbpalmstar.engine.universalex.EUExBase;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
@@ -16,6 +12,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.zywx.wbpalmstar.engine.EBrowserView;
+import org.zywx.wbpalmstar.engine.universalex.EUExBase;
+
+import java.util.HashMap;
+import java.util.Set;
+
 public class EUExCoverFlow2 extends EUExBase {
 
     public static final String CALLBACK_LOAD_DATA = "uexCoverFlow2.loadData";
@@ -27,9 +31,10 @@ public class EUExCoverFlow2 extends EUExBase {
     private static final int MSG_CLOSE = 3;
     private HashMap<String, CoverFlowMainView> coverViews = new HashMap<String, CoverFlowMainView>();
 
+    final String INVALID_CODE = null;
+
     public EUExCoverFlow2(Context context, EBrowserView inParent) {
         super(context, inParent);
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -111,6 +116,61 @@ public class EUExCoverFlow2 extends EUExBase {
 
     }
 
+    public String create(String [] params) {
+        if (params == null || params.length < 1) {
+            return INVALID_CODE;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(params[0]);
+            int x = jsonObject.optInt("x");
+            int y = jsonObject.optInt("y");
+            int w = jsonObject.getInt("width");
+            int h = jsonObject.getInt("height");
+            boolean isAddToWebView = jsonObject.optBoolean("isScrollWithWeb", false);
+
+            final CoverFlowData coverFlowData = CoverFlowData.parseCoverFlowJson(params[0]);
+
+            if (coverFlowData == null) {
+                return INVALID_CODE;
+            }
+            if (coverViews.containsKey(coverFlowData.getTmId())){
+                return INVALID_CODE;
+            }
+
+            String tmId = coverFlowData.getTmId();
+            final String imgBgPath = coverFlowData.getPlaceholderImage();
+
+            CoverFlowMainView coverFlowView = new CoverFlowMainView(mContext, w, h);
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(w, h);
+            lp.leftMargin = x;
+            lp.topMargin = y;
+            if(isAddToWebView){
+                @SuppressWarnings("deprecation")
+                AbsoluteLayout.LayoutParams lps = new AbsoluteLayout.LayoutParams(
+                        w, h, x, y);
+                addViewToWebView(coverFlowView, lps, tmId);
+            }else{
+                addView2CurrentWindow(coverFlowView, lp);
+            }
+            coverViews.put(tmId, coverFlowView);
+
+
+            coverFlowView.setData(imgBgPath, coverFlowData, new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    String js = SCRIPT_HEADER + "if(" + ON_ITEM_SELECTED + "){" + ON_ITEM_SELECTED + "('"
+                            + coverFlowData.getTmId() + "'," + adapterView.getAdapter().getItem(position)
+                            + ");}";
+                    onCallback(js);
+                }
+            });
+            return tmId;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return INVALID_CODE;
+    }
+
     public void setJsonData(String[] params) {
         if (params == null || params.length < 1) {
             errorCallback(0, 0, "error params!");
@@ -163,7 +223,11 @@ public class EUExCoverFlow2 extends EUExBase {
     }
 
     private void closeMsg(String[] params) {
-        if (params.length < 1) {
+        if (params == null || params.length < 1) {
+            Set<String> keySet = coverViews.keySet();
+            for (String key : keySet) {
+                closeCoverFlowView(key);
+            }
             return;
         }
         String[] paramsArray = params[0].split(",");

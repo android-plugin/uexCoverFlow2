@@ -21,12 +21,12 @@
     }
     function pieOpen(){
     	alert("Open(web)");
-		var w = screen.availWidth/2;
-        var h = screen.availHeight/2;
-        
+		var w = screen.availWidth;
+        var h = screen.availHeight;
+
          var divTop = document.getElementById("topDiv").offsetTop + document.getElementById("topDiv").offsetHeight;
 		divTop = 0;
-        uexCoverFlow2.open("500","100",divTop,w,h,"1");
+        uexCoverFlow2.open("510",0,divTop,540,960,"1");
      }
     function pieOpen1(){
     	alert("Open(win)");
@@ -50,20 +50,34 @@
 //            http://www.cmkjz.com/uploads/allimg/100116/0134423.jpg
 //            http://82238.com/uploads/allimg/110519/2-110519130404.jpg
 //            http://www.qqhead.com/UploadFiles/2010-04/2010458740103062.gif
-            var jsonStr ='{"id":"'+id+'","data":[{"title":"123","imageUrl":"http://www.cmkjz.com/uploads/allimg/100116/0134423.jpg"},{"title":"456","imageUrl":"http://82238.com/uploads/allimg/110519/2-110519130404.jpg"},{"title":"","imageUrl":"http://www.qqhead.com/UploadFiles/2010-04/2010458740103062.gif"},{"title":"","imageUrl":"http://a4.att.hudong.com/06/63/01300001216886130487639263274.jpg"}]}';
+            var jsonStr ='{"id":"'+id+'","data":[{"title":"123","imageUrl":"http://pic1.win4000.com/mobile/f/579ee43caef05.jpg"},{"title":"456","imageUrl":"http://pic1.win4000.com/mobile/c/579821195fe88.jpg"},{"title":"","imageUrl":"http://pic1.win4000.com/mobile/f/579ee43f7f7a9.jpg"},{"title":"","imageUrl":"http://a4.att.hudong.com/06/63/01300001216886130487639263274.jpg"}]}';
             uexCoverFlow2.setJsonData(jsonStr,"res://uexCoverFlow2_tupian.png");
         }
         uexCoverFlow2.onItemSelected = function(opId,index){
             alert("opId:"+opId+"index:"+index)
         }
 	}
-	
+	function create() {
+	    var data = {
+	        "x": 0,
+	        "y": 0,
+	        "width": screen.availWidth,
+	        "height":600,
+	        "isScrollWithWeb": false,
+	        "placeholderImage":"res://uexCoverFlow2_tupian.png",
+	        "data":["http://pic1.win4000.com/mobile/f/579ee43caef05.jpg", "http://pic1.win4000.com/mobile/c/579821195fe88.jpg", "http://pic1.win4000.com/mobile/f/579ee43f7f7a9.jpg","http://a4.att.hudong.com/06/63/01300001216886130487639263274.jpg"]
+	        //"data":[{"title":"123","imageUrl":"http://pic1.win4000.com/mobile/f/579ee43caef05.jpg"},{"title":"456","imageUrl":"http://pic1.win4000.com/mobile/c/579821195fe88.jpg"},{"title":"","imageUrl":"http://pic1.win4000.com/mobile/f/579ee43f7f7a9.jpg"},{"title":"","imageUrl":"http://a4.att.hudong.com/06/63/01300001216886130487639263274.jpg"}]
+	    }
+	    uexCoverFlow2.create(JSON.stringify(data));
+	}
+
 		</script>
   </head>
 <body class="um-vp " ontouchstart>
     <div class="tit">CoverFlow2</div>
 	<div class="conbor">
 			<div class="consj" id="topDiv">
+                <input class="btn" type="button" value="打开CoverFlow2-Create(web)" onclick="create();">
 				<input class="btn" type="button" value="打开CoverFlow2(web)" onclick="pieOpen();">
 				<input class="btn" type="button" value="打开CoverFlow2(win)" onclick="pieOpen1();">
                 <input class="btn" type="button" value="关闭(web)" onclick="pieClose();">

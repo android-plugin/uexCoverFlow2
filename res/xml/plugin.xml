@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
 	<plugin
-	    className="org.zywx.wbpalmstar.plugin.uexCoverFlow.EUExCoverFlow2" 
+	    className="org.zywx.wbpalmstar.plugin.uexCoverFlow.EUExCoverFlow2"
 	    uexName="uexCoverFlow2">
 	    <method name="open"/>
+	    <method name="create"/>
 	    <method name="setJsonData"/>
-	    <method name="close"/> 
+	    <method name="close"/>
 	</plugin>
 </uexplugins>
