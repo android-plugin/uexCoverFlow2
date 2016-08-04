@@ -32,18 +32,26 @@ public class CoverFlowData {
             coverFlow = new CoverFlowData();
             coverFlow.setTmId(json.optString(JK_ID, String.valueOf(getRandomId())));
             coverFlow.setPlaceholderImage(json.getString(JK_PLACEHOLDER_IMAGE));
-            JSONArray array = json.getJSONArray(JK_DATA);
-            for (int i = 0, size = array.length(); i < size; i++) {
-                ItemInfo itemInfo = new ItemInfo();
-                if (array.get(i) instanceof String) {//如果数组中只有图片的url
-                    itemInfo.setImgUrl(array.get(i).toString());
-                } else {//如果数组中是对象，包含有title和url
+            if (json.has(JK_DATA)) {
+                JSONArray array = json.getJSONArray(JK_DATA);
+                for (int i = 0, size = array.length(); i < size; i++) {
+                    ItemInfo itemInfo = new ItemInfo();
+
                     JSONObject jsonItem = array.getJSONObject(i);
                     itemInfo.setTitle(jsonItem.optString(JK_TITLE));
                     itemInfo.setImgUrl(jsonItem.getString(JK_URL_IMAGE_URL));
+
+                    coverFlow.add(itemInfo);
                 }
-                coverFlow.add(itemInfo);
+            } else if (json.has("imageUrl")) {
+                JSONArray array = json.getJSONArray("imageUrl");
+                for (int i = 0, size = array.length(); i < size; i++) {
+                    ItemInfo itemInfo = new ItemInfo();
+                    itemInfo.setImgUrl(array.getString(i));
+                    coverFlow.add(itemInfo);
+                }
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
