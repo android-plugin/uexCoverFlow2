@@ -23,12 +23,8 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
-import com.ace.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
-import com.ace.universalimageloader.core.ImageLoader;
-import com.ace.universalimageloader.core.ImageLoaderConfiguration;
-import com.ace.universalimageloader.core.assist.FailReason;
-import com.ace.universalimageloader.core.assist.QueueProcessingType;
-import com.ace.universalimageloader.core.listener.ImageLoadingListener;
+import org.zywx.wbpalmstar.base.ACEImageLoader;
+import org.zywx.wbpalmstar.base.listener.ImageLoaderListener;
 
 import java.util.List;
 
@@ -40,7 +36,6 @@ public class ImageAdapter extends BaseAdapter {
     private List<CoverFlowData.ItemInfo> mImgList;
     private List<CoverFlowData.ItemInfo> mOrgImgList;
     private LinearLayout[] mImages;
-    private ImageLoader imageLoader;
     private int imgWidth;
     private int imgHeight;
     private String mImgBgPath;
@@ -50,7 +45,6 @@ public class ImageAdapter extends BaseAdapter {
         mImgList = imgList;
         mOrgImgList = orgImgList;
         mImgBgPath = imgBgPath;
-        initImageLoader(c);
         mImages = new LinearLayout[mImgList.size()];
         if(bgBitmap == null&& TextUtils.isEmpty(imgBgPath)) {
             bgBitmap = combinateFrame(drawBgBitmap(CoverFlowDataUtility.getImage(mContext, mImgBgPath)));
@@ -80,27 +74,12 @@ public class ImageAdapter extends BaseAdapter {
                 if (bgBitmap!=null){
                     imageView.setImageBitmap(bgBitmap);
                 }
-                ImageLoader.getInstance().loadImage(itemInfo.getImgUrl(), new ImageLoadingListener() {
+                ACEImageLoader.getInstance().getBitmap(itemInfo.getImgUrl(), new ImageLoaderListener() {
                     @Override
-                    public void onLoadingStarted(String s, View view) {
-
-                    }
-
-                    @Override
-                    public void onLoadingFailed(String s, View view, FailReason failReason) {
-
-                    }
-
-                    @Override
-                    public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                    public void onLoaded(Bitmap bitmap) {
                         if(bitmap != null){
                             imageView.setImageBitmap(bitmap);
                         }
-                    }
-
-                    @Override
-                    public void onLoadingCancelled(String s, View view) {
-
                     }
                 });
                 if((mOrgImgList != null) && (mOrgImgList.size() < 4)) {
@@ -167,18 +146,6 @@ public class ImageAdapter extends BaseAdapter {
     public float getScale(boolean focused, int offset) {
         return Math.max(0, 1.0f / (float) Math.pow(2, Math.abs(offset)));
     }
-
-
-    private void initImageLoader(Context context) {
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-                .threadPriority(Thread.MAX_PRIORITY).denyCacheImageMultipleSizesInMemory()
-                .diskCacheFileNameGenerator(new Md5FileNameGenerator()).tasksProcessingOrder(QueueProcessingType.LIFO)
-                .diskCacheSize(20 * 1024 * 1024)
-                .diskCacheFileCount(10)
-                .build();
-        ImageLoader.getInstance().init(config);
-    }
-
 
     public int getImgWidth() {
         return imgWidth;
