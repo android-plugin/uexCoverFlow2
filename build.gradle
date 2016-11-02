@@ -19,8 +19,8 @@ repositories {
     }
 }
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
-    compile ('org.appcan:engine:+:systemRelease@aar')
+    compile fileTree(include: '*.jar', dir: 'libs')
+    compile 'org.appcan:engine:+:systemRelease@aar'
 }
 
 
@@ -33,8 +33,10 @@ android {
     }
     defaultConfig {
         applicationId "org.zywx.wbpalmstar.widgetone.uexcoverflow2"
+        multiDexEnabled true
+        minSdkVersion 14
+        targetSdkVersion 14
     }
-
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -44,7 +46,7 @@ android {
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
-            jniLibs.srcDirs=['libs']
+            jniLibs.srcDirs = ['libs']
         }
 
         // Move the tests to tests/java, tests/res, etc...
@@ -58,6 +60,8 @@ android {
         // by a similar customization.
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
+    }
+    productFlavors {
     }
 }
 apply from: "https://raw.githubusercontent.com/android-plugin/gradle-plugin/master/buildPlugin.gradle"

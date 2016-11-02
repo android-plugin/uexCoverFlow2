@@ -31,7 +31,7 @@ public class CoverFlowData {
             JSONObject json = new JSONObject(msg);
             coverFlow = new CoverFlowData();
             coverFlow.setTmId(json.optString(JK_ID, String.valueOf(getRandomId())));
-            coverFlow.setPlaceholderImage(json.getString(JK_PLACEHOLDER_IMAGE));
+            coverFlow.setPlaceholderImage(json.optString(JK_PLACEHOLDER_IMAGE));
             if (json.has(JK_DATA)) {
                 JSONArray array = json.getJSONArray(JK_DATA);
                 for (int i = 0, size = array.length(); i < size; i++) {

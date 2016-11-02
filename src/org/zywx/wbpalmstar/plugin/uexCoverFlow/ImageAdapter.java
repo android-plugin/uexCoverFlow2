@@ -14,6 +14,7 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Shader.TileMode;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,8 +52,10 @@ public class ImageAdapter extends BaseAdapter {
         mImgBgPath = imgBgPath;
         initImageLoader(c);
         mImages = new LinearLayout[mImgList.size()];
-        if(bgBitmap == null)
+        if(bgBitmap == null&& TextUtils.isEmpty(imgBgPath)) {
             bgBitmap = combinateFrame(drawBgBitmap(CoverFlowDataUtility.getImage(mContext, mImgBgPath)));
+        }
+
     }
 
     public boolean createReflectedImages() {
@@ -74,8 +77,9 @@ public class ImageAdapter extends BaseAdapter {
                 imageView.setBackgroundColor(Color.TRANSPARENT);
                 imgLinearLayout.addView(imageView);
                 mImages[i] = imgLinearLayout;
-                imageView.setImageBitmap(bgBitmap);
-
+                if (bgBitmap!=null){
+                    imageView.setImageBitmap(bgBitmap);
+                }
                 ImageLoader.getInstance().loadImage(itemInfo.getImgUrl(), new ImageLoadingListener() {
                     @Override
                     public void onLoadingStarted(String s, View view) {
