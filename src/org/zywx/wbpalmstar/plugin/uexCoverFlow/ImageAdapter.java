@@ -46,7 +46,7 @@ public class ImageAdapter extends BaseAdapter {
         mOrgImgList = orgImgList;
         mImgBgPath = imgBgPath;
         mImages = new LinearLayout[mImgList.size()];
-        if(bgBitmap == null&& TextUtils.isEmpty(imgBgPath)) {
+        if(bgBitmap == null&& !TextUtils.isEmpty(imgBgPath)) {
             bgBitmap = combinateFrame(drawBgBitmap(CoverFlowDataUtility.getImage(mContext, mImgBgPath)));
         }
 
